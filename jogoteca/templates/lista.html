@@ -3,31 +3,41 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Jogos</title>
+    <title>{{ titulo }}</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
   </head>
   <body>
     <div class="container">
         <div class="page-header">
-            <h1>Jogoteca</h1>
+            <h1>{{ titulo }}</h1>
         </div>
-        <table class="table table-striped table-responsive table-bordered">
+        <table class="table table-striped  table-bordered">
             <thead class="thead-default">
                 <tr>
                     <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Console</th>
                 </tr>
             </thead>
             <tbody>
+            {% if lista_jogos %}
+               {% for jogo in lista_jogos %}
                 <tr>
-                    <td>God of War</td>
+                    <td>{{ jogo.nome }}</td>
+                    <td>{{ jogo.categoria }}</td>
+                    <td>{{ jogo.console }}</td>
                 </tr>
+                {% endfor %}
+            {% else %}
                 <tr>
-                    <td>Pokemon Silver</td>
+                    <td>Nenhum jogo aqui...</td>
                 </tr>
-                <tr>
-                    <td>Super Mario RPG</td>
-                </tr>
+            {% endif %}
             </tbody>
         </table>
     </div>
+
+    <script src="/static/js/jquery-3.5.1.min.js" charset="utf-8"></script>
+    <script src="/static/js/bootstrap.js" charset="utf-8"></script>
   </body>
 </html>
