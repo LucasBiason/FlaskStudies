@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+<form method='POST' action='/novo'>
+    <fieldset>
+        <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" class="form-control">
+        </div>
+        <div class="form-group">
+        <label for="categoria">Categoria</label>
+        <input type="text" id="categoria" name="categoria" class="form-control">
+        </div>
+        <div class="form-group">
+        <label for="console">Console</label>
+        <input type="text" id="console" name="console" class="form-control">
+        </div>
+        <button type="button" class="btn btn-danger btn-cancelar" onclick='window.location.href="/home"'>Cancelar</button>
+        <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
+    </fieldset>
+</form>
+
+{% endblock %}
