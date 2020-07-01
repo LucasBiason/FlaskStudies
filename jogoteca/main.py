@@ -14,9 +14,7 @@ def listagem():
         'titulo': 'Jogos',
         'lista_jogos': JOGOS
     }
-    return render_template(
-        'lista.html', ** context
-    )
+    return render_template( 'lista.html', ** context)
     
 
 @app.route('/novo', methods=['GET', 'POST' ])
