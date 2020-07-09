@@ -7,3 +7,10 @@ Mini Projetos de Cursos, Livros e artigos de Flask.
 Pasta: jogoteca
 
 Sobre: um projeto de uma biblioteca de jogos.
+
+
+## Flask parte 2: Avançando no desenvolvimento web
+Pasta: jogoteca
+
+Sobre: continuando e complementando o projeto da biblioteca de jogos.
+
