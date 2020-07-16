@@ -30,16 +30,18 @@ def listagem():
 def cadastro():
     context = {
         'titulo': 'Jogos - Cadastro',
+        'jogo': None
     }
     
     if flask.request.method == 'POST':
+        id =  flask.request.form.get('id')
         nome =  flask.request.form.get('nome')
         categoria =  flask.request.form.get('categoria')
         console =  flask.request.form.get('console')
-        jogo_novo = Jogo(nome, categoria, console)
+        jogo_novo = Jogo(nome, categoria, console, id=id)
         Jogo.salvar(db, jogo_novo)
         flask.flash(
-            'Jogo {} cadastrado com sucesso.'.format(
+            'Jogo {} salvo com sucesso.'.format(
                 jogo_novo.nome
             ),
             'success'
@@ -50,11 +52,28 @@ def cadastro():
         'novo.html', ** context
     )
 
+
+@app.route('/editar/<int:id>', methods=['GET', 'POST' ])
+@login_required
+def editar(id):
+    jogo = Jogo.busca_por_id(db, id)
+    context = {
+        'titulo': 'Jogos - Editando jogo',
+        'jogo': jogo
+    }    
+    return render_template('novo.html', ** context)
+
+@app.route('/deletar/<int:id>')
+def deletar(id):
+    Jogo.deletar(db, id)
+    flask.flash('O jogo foi removido com sucesso!', 'success')
+    return flask.redirect( flask.url_for('listagem'))
     
 @app.route('/login')
 def login():
     proxima = flask.request.args.get('proxima', '')
     return render_template('login.html', proxima=proxima)
+
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():

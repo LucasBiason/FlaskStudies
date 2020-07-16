@@ -49,6 +49,6 @@ class Jogo:
         return jogo
 
     @classmethod
-    def deletar(self, db):
+    def deletar(self, db, id):
         db.connection.cursor().execute( 'delete from jogo where id = %s', (id, ))
         db.connection.commit()
