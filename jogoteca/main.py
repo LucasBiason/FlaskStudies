@@ -6,14 +6,21 @@ from decorators import login_required
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
-JOGOS =  Jogo.get_jogos()
+from flask_mysqldb import MySQL
+app.config['MYSQL_HOST'] = "0.0.0.0"
+app.config['MYSQL_USER'] = "root"
+app.config['MYSQL_PASSWORD'] = "admin"
+app.config['MYSQL_DB'] = "jogoteca"
+app.config['MYSQL_PORT'] = 3306
+db = MySQL(app)
+
 
 @app.route('/')
 @login_required
 def listagem():
     context = {
         'titulo': 'Jogos',
-        'lista_jogos': JOGOS
+        'lista_jogos':  Jogo.get_jogos(db)
     }
     return render_template( 'lista.html', ** context)
     
@@ -30,14 +37,14 @@ def cadastro():
         categoria =  flask.request.form.get('categoria')
         console =  flask.request.form.get('console')
         jogo_novo = Jogo(nome, categoria, console)
-        JOGOS.append(jogo_novo)
+        Jogo.salvar(db, jogo_novo)
         flask.flash(
             'Jogo {} cadastrado com sucesso.'.format(
                 jogo_novo.nome
             ),
             'success'
         )
-        return flask.redirect('/home')
+        return flask.redirect('/')
         
     return render_template(
         'novo.html', ** context
@@ -46,19 +53,21 @@ def cadastro():
     
 @app.route('/login')
 def login():
-    proxima = flask.request.args.get('proxima')
+    proxima = flask.request.args.get('proxima', '')
     return render_template('login.html', proxima=proxima)
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():
     status, retorno = Usuario.autenticar(
-         flask.request.form['usuario'],
-         flask.request.form['senha']         
+        db,
+        flask.request.form['usuario'],
+        flask.request.form['senha']         
     )
     if status:
         flask.flash(retorno.nome + ' logou com sucesso!', 'success')
         proxima_pagina =  flask.request.form.get('proxima', '')
         flask.session['usuario_logado'] = retorno.id
+        print("proxima_pagina: ", proxima_pagina)
         return  flask.redirect('/' if not proxima_pagina else proxima_pagina)
     
     flask.flash(retorno, 'danger')
