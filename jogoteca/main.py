@@ -1,4 +1,4 @@
-import flask
+import flask, os
 from flask  import Flask, render_template
 from models import Jogo, Usuario
 from decorators import login_required
@@ -12,6 +12,7 @@ app.config['MYSQL_USER'] = "root"
 app.config['MYSQL_PASSWORD'] = "admin"
 app.config['MYSQL_DB'] = "jogoteca"
 app.config['MYSQL_PORT'] = 3306
+app.config['UPLOAD_PATH'] = os.path.dirname(os.path.abspath(__file__)) + '/uploads'
 db = MySQL(app)
 
 
@@ -30,7 +31,8 @@ def listagem():
 def cadastro():
     context = {
         'titulo': 'Jogos - Cadastro',
-        'jogo': None
+        'jogo': None,
+        'capa_jogo': ''
     }
     
     if flask.request.method == 'POST':
@@ -40,6 +42,11 @@ def cadastro():
         console =  flask.request.form.get('console')
         jogo_novo = Jogo(nome, categoria, console, id=id)
         Jogo.salvar(db, jogo_novo)
+            
+        arquivo = request.files['arquivo']
+        upload_path = app.config['UPLOAD_PATH']
+        arquivo.save(f'{upload_path}/capa{jogo.id}.jpg')
+    
         flask.flash(
             'Jogo {} salvo com sucesso.'.format(
                 jogo_novo.nome
@@ -59,7 +66,8 @@ def editar(id):
     jogo = Jogo.busca_por_id(db, id)
     context = {
         'titulo': 'Jogos - Editando jogo',
-        'jogo': jogo
+        'jogo': jogo,
+        'capa_jogo': f'capa{id}.jpg'
     }    
     return render_template('novo.html', ** context)
 
@@ -69,6 +77,21 @@ def deletar(id):
     flask.flash('O jogo foi removido com sucesso!', 'success')
     return flask.redirect( flask.url_for('listagem'))
     
+    
+
+@app.route('/uploads/')    
+@app.route('/uploads/<nome_arquivo>')
+def imagem(nome_arquivo=None):
+    default = 'capa_padrao.jpg'
+    if not nome_arquivo:
+        nome_arquivo =default
+    try:
+        return flask.send_from_directory('uploads', nome_arquivo)
+    except:
+        return flask.send_from_directory('uploads', default)
+
+
+
 @app.route('/login')
 def login():
     proxima = flask.request.args.get('proxima', '')

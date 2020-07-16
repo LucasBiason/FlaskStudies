@@ -2,7 +2,7 @@
 
 {% block main %}
 
-<form method='POST' action='/novo'>
+<form method='POST' action='/novo' enctype="multipart/form-data">
     <fieldset>
         {% if jogo %}<input type='hidden'  name="id" value="{{ jogo.id }}">{% endif %}
 
@@ -20,6 +20,15 @@
             <label for="console">Console</label>
             <input type="text" id="console" name="console" class="form-control"  value="{{ jogo.console }}">
         </div>
+
+        <figure>
+           <img src="{{ url_for('imagem', nome_arquivo=capa_jogo)}}">
+            <figcaption>
+            <label>
+                <input type="file" name="arquivo" accept=".jpg">
+            </label>
+            </figcaption>
+        </figure>
 
         <button type="button" class="btn btn-danger btn-cancelar" onclick='window.location.href="/"'>Cancelar</button>
         <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
