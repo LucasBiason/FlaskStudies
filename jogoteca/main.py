@@ -1,4 +1,4 @@
-import flask, os
+import flask, os, time
 from flask  import Flask, render_template
 from models import Jogo, Usuario
 from decorators import login_required
@@ -32,7 +32,8 @@ def cadastro():
     context = {
         'titulo': 'Jogos - Cadastro',
         'jogo': None,
-        'capa_jogo': ''
+        'capa_jogo': '',
+        'timestamp':''
     }
     
     if flask.request.method == 'POST':
@@ -40,17 +41,15 @@ def cadastro():
         nome =  flask.request.form.get('nome')
         categoria =  flask.request.form.get('categoria')
         console =  flask.request.form.get('console')
-        jogo_novo = Jogo(nome, categoria, console, id=id)
-        Jogo.salvar(db, jogo_novo)
+        jogo = Jogo(nome, categoria, console, id=id)
+        Jogo.salvar(db, jogo)
             
-        arquivo = request.files['arquivo']
+        arquivo =  flask.request.files['arquivo']
         upload_path = app.config['UPLOAD_PATH']
         arquivo.save(f'{upload_path}/capa{jogo.id}.jpg')
     
         flask.flash(
-            'Jogo {} salvo com sucesso.'.format(
-                jogo_novo.nome
-            ),
+            f'Jogo {jogo.nome} salvo com sucesso.',
             'success'
         )
         return flask.redirect('/')
@@ -67,7 +66,8 @@ def editar(id):
     context = {
         'titulo': 'Jogos - Editando jogo',
         'jogo': jogo,
-        'capa_jogo': f'capa{id}.jpg'
+        'capa_jogo': f'capa{id}.jpg',
+        'timestamp': time.time()
     }    
     return render_template('novo.html', ** context)
 

@@ -2,8 +2,19 @@
 
 {% block main %}
 
-<form method='POST' action='/novo' enctype="multipart/form-data">
-    <fieldset>
+<form method='POST' action='/novo' enctype="multipart/form-data" class='row'>
+
+    <figure class="thumb col-md-3" >
+        <img class="capa_jogo col-md-12"  src="{{ url_for('imagem', nome_arquivo=capa_jogo)}}?time={{timestamp}}">
+        <figcaption>
+            <label class="fileContainer">
+                Mudar capa
+                <input type="file" name="arquivo" accept=".jpg">
+            </label>
+        </figcaption>
+    </figure>
+        
+    <fieldset  class="col-md-8" >
         {% if jogo %}<input type='hidden'  name="id" value="{{ jogo.id }}">{% endif %}
 
         <div class="form-group">
@@ -20,15 +31,6 @@
             <label for="console">Console</label>
             <input type="text" id="console" name="console" class="form-control"  value="{{ jogo.console }}">
         </div>
-
-        <figure>
-           <img src="{{ url_for('imagem', nome_arquivo=capa_jogo)}}">
-            <figcaption>
-            <label>
-                <input type="file" name="arquivo" accept=".jpg">
-            </label>
-            </figcaption>
-        </figure>
 
         <button type="button" class="btn btn-danger btn-cancelar" onclick='window.location.href="/"'>Cancelar</button>
         <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
