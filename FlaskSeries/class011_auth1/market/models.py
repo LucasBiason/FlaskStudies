@@ -14,7 +14,7 @@ class User(db.Model):
 
     @property
     def password(self):
-        return self.password
+        return self.password_hash
 
     @password.setter
     def password(self, plain_text_password):
