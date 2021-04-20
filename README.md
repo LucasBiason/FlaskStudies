@@ -21,3 +21,11 @@ Mini Projetos de Cursos, Livros e artigos de Flask.
 **Link:** [Playlist](https://www.youtube.com/watch?v=p068JokuThU&list=PLOkVupluCIjuPtTkhO6jmA76uQR994Wvi)
 
 **Sobre:** aplicação de loja virtual
+
+## REST APIs com Python e Flask
+
+**Pasta:** RestFlask-Hotels
+
+**Link:** [Página Curso](https://www.udemy.com/course/rest-apis-com-python-e-flask/)
+
+**Sobre:** aplicação de hoteis com REST API em Flask
