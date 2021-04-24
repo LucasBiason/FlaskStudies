@@ -1,79 +1,63 @@
 from flask_restful import Resource, reqparse
 from models import HotelModel
 
-hoteis = [
-    {
-        'hotel_id': 'alpha',
-        'nome': 'Alpha Hotel',
-        'estrelas': 4.3,
-        'diaria': 420.34,
-        'cidade': 'Rio de Janeiro'
-    },
-    {
-        'hotel_id': 'beta',
-        'nome': 'Beta Hotel',
-        'estrelas': 4.7,
-        'diaria': 390.99,
-        'cidade': 'São Paulo'
-    },
-    {
-        'hotel_id': 'gama',
-        'nome': 'Gama Hotel',
-        'estrelas': 4.5,
-        'diaria': 320.30,
-        'cidade': 'Santa Catarina'
-    }
-]
 
 class Hoteis(Resource):
+    param_args = reqparse.RequestParser()
+    param_args.add_argument('nome')
 
     def get(self):
-        return {'hoteis': hoteis}
+        dados = Hoteis.param_args.parse_args()
+        queryset = HotelModel.get_queryset(**dados)
+        return {'hoteis': self.serialize(queryset)}
+
+    def serialize(self, queryset):
+        return [ h.serialize() for h in queryset ]
+
 
 class Hotel(Resource):
-    atributos = reqparse.RequestParser()
-    atributos.add_argument('nome')
-    atributos.add_argument('estrelas')
-    atributos.add_argument('diaria')
-    atributos.add_argument('cidade')
-
-    def find_hotel(hotel_id):
-        for hotel in hoteis:
-            if hotel['hotel_id'] == hotel_id:
-                return hotel
-        return False
+    param_args = reqparse.RequestParser()
+    param_args.add_argument('nome', type=str, required=True, help="The field 'nome' cannot be left blank")
+    param_args.add_argument('estrelas', type=float, required=True, help="The field 'estrela' cannot be left blank")
+    param_args.add_argument('diaria')
+    param_args.add_argument('cidade')
 
     def get(self, hotel_id):
-        hotel = Hotel.find_hotel(hotel_id)
+        hotel = HotelModel.get_or_none(hotel_id)
         if hotel:
-            return hotel
-        return {'message': 'Hotel not found.'}, 404
+            return hotel.serialize(), 200
+        return {'message': 'Hotel not found.'}, 401
 
     def post(self, hotel_id):
-        dados = Hotel.atributos.parse_args()
-        #novo_hotel = {'hotel_id': hotel_id, **dados}
-        novo_hotel = HotelModel(hotel_id, **dados)
-        novo_hotel = novo_hotel.json()
-        hoteis.append(novo_hotel)
-        return novo_hotel, 200
+        hotel = HotelModel.get_or_none(hotel_id)
+        if hotel:
+            return {'message': f'Hotel id {hotel_id} already exists.'}, 401
+
+        dados = Hotel.param_args.parse_args()
+        try:
+            novo_hotel = HotelModel.perform_save(hotel_id, **dados)
+        except Exception:
+            return {'message': 'An error ocurred tryint to save hotel.'}, 500
+        return novo_hotel.serialize(), 200
 
     def put(self, hotel_id):
-        dados = Hotel.atributos.parse_args()
-        #novo_hotel = {'hotel_id': hotel_id, **dados}
-        novo_hotel = HotelModel(hotel_id, **dados)
-        novo_hotel = novo_hotel.json()
+        hotel = HotelModel.get_or_none(hotel_id)
+        if not hotel:
+            return {'message': f'Hotel id {hotel_id} not found.'}, 401
 
-        hotel = Hotel.find_hotel(hotel_id)
-        if hotel:
-            hotel.update(novo_hotel)
-            return hotel, 200
-        hoteis.append(novo_hotel)
-        return novo_hotel, 201
+        dados = Hotel.param_args.parse_args()
+        try:
+            novo_hotel = HotelModel.perform_update(hotel_id, **dados)
+        except Exception:
+            return {'message': 'An error ocurred tryint to save hotel.'}, 500
+        return novo_hotel.serialize(), 201
 
     def delete(self, hotel_id):
-        global hoteis
-        hotel = Hotel.find_hotel(hotel_id)
+        hotel = HotelModel.get_or_none(hotel_id)
         if not hotel:
-            return {'message': 'Hotel not found.'}, 404
-        hoteis.remove(hotel)
+            return {'message': f'Hotel id {hotel_id} not found.'}, 401
+        try:
+            hotel.remove()
+        except Exception:
+            return {'message': 'An error ocurred tryint to delete hoel.'}, 500
         return {'message': 'Hotel deleted.'}, 200
